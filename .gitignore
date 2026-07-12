@@ -1,0 +1,40 @@
+# Java 编译产物
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE / 编辑器
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+.nb-gradle/
+
+# 课件 / 展示内容（明确不上传）
+*.pptx
+*.ppt
+generate_ppt.py
+class_diagram.png
+
+# 系统 / 日志
+.DS_Store
+Thumbs.db
+*.log
+*.bak
+*.swp
+*~
+
+# 隐私 / 临时文件
+*.env
+.env
+secrets.*
+credentials.*
+*.local
