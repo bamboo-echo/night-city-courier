@@ -44,9 +44,9 @@ public class GameWindow extends JFrame {
     private static final Color BUTTON_HOVER_GLOW = new Color(0x00, 0xFF, 0xFF, 0x40);
     private static final Color DIMMED_TEXT = new Color(0x55, 0x55, 0x66);
 
-    private static final Font TERMINAL_FONT = new Font("Microsoft YaHei", Font.PLAIN, 16);
-    private static final Font BUTTON_FONT = new Font("Microsoft YaHei", Font.BOLD, 15);
-    private static final Font TITLE_FONT = new Font("Microsoft YaHei", Font.PLAIN, 11);
+    private static final Font TERMINAL_FONT = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 16);
+    private static final Font BUTTON_FONT = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 15);
+    private static final Font TITLE_FONT = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 11);
 
     private JTextPane outputPane;
     private StyledDocument doc;
@@ -123,7 +123,7 @@ public class GameWindow extends JFrame {
         outputPane.setBorder(new EmptyBorder(10, 15, 10, 15));
         MutableAttributeSet globalAttrs = new SimpleAttributeSet();
         StyleConstants.setLineSpacing(globalAttrs, 0.35f);
-        StyleConstants.setFontFamily(globalAttrs, "Microsoft YaHei");
+        StyleConstants.setFontFamily(globalAttrs, GameConfig.FONT_FAMILY);
         StyleConstants.setFontSize(globalAttrs, 16);
         outputPane.setParagraphAttributes(globalAttrs, true);
         doc = outputPane.getStyledDocument();
@@ -571,7 +571,7 @@ public class GameWindow extends JFrame {
                 if (cachedColorStyle == null || cachedColorStyleColor != currentLineColor || cachedColorStyleBold != currentLineBold) {
                     cachedColorStyle = outputPane.addStyle("lineColor_" + currentLineColor.hashCode() + "_" + currentLineBold, null);
                     StyleConstants.setForeground(cachedColorStyle, currentLineColor);
-                    StyleConstants.setFontFamily(cachedColorStyle, "Microsoft YaHei");
+                    StyleConstants.setFontFamily(cachedColorStyle, GameConfig.FONT_FAMILY);
                     StyleConstants.setFontSize(cachedColorStyle, 16);
                     if (currentLineBold) StyleConstants.setBold(cachedColorStyle, true);
                     cachedColorStyleColor = currentLineColor;
@@ -594,7 +594,7 @@ public class GameWindow extends JFrame {
         if (cachedMainStyle == null) {
             cachedMainStyle = outputPane.addStyle("mainChar", null);
             StyleConstants.setForeground(cachedMainStyle, FG_MAIN);
-            StyleConstants.setFontFamily(cachedMainStyle, "Microsoft YaHei");
+            StyleConstants.setFontFamily(cachedMainStyle, GameConfig.FONT_FAMILY);
             StyleConstants.setFontSize(cachedMainStyle, 16);
         }
     }
@@ -603,7 +603,7 @@ public class GameWindow extends JFrame {
         if (cachedEmojiStyle == null) {
             cachedEmojiStyle = outputPane.addStyle("emojiChar", null);
             StyleConstants.setForeground(cachedEmojiStyle, FG_MAIN);
-            StyleConstants.setFontFamily(cachedEmojiStyle, "Segoe UI Emoji");
+            StyleConstants.setFontFamily(cachedEmojiStyle, GameConfig.EMOJI_FONT_FAMILY);
             StyleConstants.setFontSize(cachedEmojiStyle, 16);
         }
     }
@@ -817,7 +817,7 @@ public class GameWindow extends JFrame {
                 cachedImpactStyle = outputPane.addStyle("impact", null);
                 StyleConstants.setForeground(cachedImpactStyle, FG_MAGENTA);
                 StyleConstants.setBold(cachedImpactStyle, true);
-                StyleConstants.setFontFamily(cachedImpactStyle, "Microsoft YaHei");
+                StyleConstants.setFontFamily(cachedImpactStyle, GameConfig.FONT_FAMILY);
                 StyleConstants.setFontSize(cachedImpactStyle, 22);
             }
             doc.insertString(doc.getLength(), "\n" + text + "\n", cachedImpactStyle);
@@ -862,9 +862,9 @@ public class GameWindow extends JFrame {
         private static final Color BAR_HEALTH = new Color(0x00, 0xCC, 0x66);
         private static final Color BAR_HEALTH_LOW = new Color(0xFF, 0x33, 0x00);
         private static final Color BAR_WANTED = new Color(0xFF, 0x00, 0x7F);
-        private static final Font FONT_SMALL = new Font("Microsoft YaHei", Font.PLAIN, 12);
-        private static final Font FONT_NORMAL = new Font("Microsoft YaHei", Font.BOLD, 13);
-        private static final Font FONT_TITLE = new Font("Microsoft YaHei", Font.BOLD, 14);
+        private static final Font FONT_SMALL = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 12);
+        private static final Font FONT_NORMAL = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 13);
+        private static final Font FONT_TITLE = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 14);
 
         private Player player;
         private Timer refreshTimer;
@@ -1634,14 +1634,14 @@ public class GameWindow extends JFrame {
         System.out.println("======================================");
         System.out.println("    夜之城快递员 赛博朋克快递员");
         System.out.println("======================================");
-        System.out.println("目标：攒够 8000 欧元逃离夜之城");
+        System.out.println("目标：攒够 " + GameConfig.WIN_TARGET + " 欧元逃离夜之城");
         System.out.println("接单、送货、活着、走人。\n");
     }
 
     public boolean showWelcomeDialog() {
-        Font titleFont = new Font("Microsoft YaHei", Font.BOLD, 32);
-        Font textFont = new Font("Microsoft YaHei", Font.PLAIN, 15);
-        Font btnFont = new Font("Microsoft YaHei", Font.BOLD, 16);
+        Font titleFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 32);
+        Font textFont = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 15);
+        Font btnFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 16);
         Color bg = new Color(0x0A, 0x0A, 0x14);
         Color borderColor = new Color(0x00, 0xCC, 0xCC);
         Color textColor = new Color(0xCC, 0xDD, 0xEE);
@@ -1692,7 +1692,7 @@ public class GameWindow extends JFrame {
                     "每天穿梭于霓虹与暗巷之间。",
                     "",
                     "你的目标只有一个：",
-                    "攒够8000欧元，逃离这座吞噬灵魂的城市。",
+                    "攒够" + GameConfig.WIN_TARGET + "欧元，逃离这座吞噬灵魂的城市。",
                     "",
                     "接单、送货、活着、走人。"
                 };
@@ -1723,10 +1723,10 @@ public class GameWindow extends JFrame {
     }
 
     public boolean showTutorialDialog() {
-        Font titleFont = new Font("Microsoft YaHei", Font.BOLD, 22);
-        Font sectionFont = new Font("Microsoft YaHei", Font.BOLD, 13);
-        Font textFont = new Font("Microsoft YaHei", Font.PLAIN, 12);
-        Font btnFont = new Font("Microsoft YaHei", Font.BOLD, 15);
+        Font titleFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 22);
+        Font sectionFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 13);
+        Font textFont = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 12);
+        Font btnFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 15);
         Color bg = new Color(0x0A, 0x0A, 0x14);
         Color borderColor = new Color(0x00, 0xCC, 0xCC);
         Color textColor = new Color(0xCC, 0xDD, 0xEE);
@@ -1820,7 +1820,7 @@ public class GameWindow extends JFrame {
                         "你的每个重要选择都会产生「回响石子」，",
                         "影响最终九道门的走向和结局类型。"},
                     {"🚪 九道门（最终挑战）",
-                        "攒够8000€后触发。面对九扇门，每扇门后是一段记忆。",
+                        "攒够" + GameConfig.WIN_TARGET + "€后触发。面对九扇门，每扇门后是一段记忆。",
                         "你可以面对、绕过或击碎——你的选择决定结局。"},
                 };
 
@@ -1886,9 +1886,9 @@ public class GameWindow extends JFrame {
     }
 
     public boolean showEndingDialog(String endingTitle, String endingSubtitle, Color titleColor) {
-        Font endingFont = new Font("Microsoft YaHei", Font.BOLD, 28);
-        Font subtitleFont = new Font("Microsoft YaHei", Font.PLAIN, 14);
-        Font btnFont = new Font("Microsoft YaHei", Font.BOLD, 15);
+        Font endingFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 28);
+        Font subtitleFont = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 14);
+        Font btnFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 15);
         Color bg = new Color(0x0A, 0x0A, 0x14);
         Color borderColor = new Color(0x00, 0xCC, 0xCC);
         Color textColor = new Color(0xCC, 0xDD, 0xEE);

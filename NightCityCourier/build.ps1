@@ -1,8 +1,7 @@
-# 夜之城快递员 - 一键构建脚本 (Windows PowerShell)
+﻿# 夜之城快递员 - 一键构建脚本 (Windows PowerShell)
 # 用法:  cd NightCityCourier ; .\build.ps1
 # 可选:  .\build.ps1 -Run      编译后直接启动游戏
 #        .\build.ps1 -Test     编译并运行单元测试
-
 param(
     [switch]$Run,
     [switch]$Test
@@ -45,7 +44,7 @@ if ($Test) {
     Write-Host "[运行] 单元测试..." -ForegroundColor Cyan
     java -cp $TestOutDir com.moji.NightCityCourier.CoreSystemsTest
     if ($LASTEXITCODE -ne 0) { Write-Host "[失败] 单元测试未全部通过" -ForegroundColor Red; exit 1 }
-    Write-Host "[完成] 单元测试全部通过 ✅" -ForegroundColor Green
+    Write-Host "[完成] 单元测试全部通过" -ForegroundColor Green
 }
 
 Write-Host "[完成] 编译产物位于 out\ 目录" -ForegroundColor Green

@@ -65,7 +65,7 @@ public class GameController {
                 case 5 -> gameWindow.showStats(player);
                 case 6 -> {
                     if (!player.isWin()) {
-                        System.out.println("你还没攒够 8000€，不能离开。继续送货吧。");
+                        System.out.println("你还没攒够 " + GameConfig.WIN_TARGET + "€，不能离开。继续送货吧。");
                     } else {
                         if (handleLastDelivery()) continue;
                         return;
@@ -85,7 +85,7 @@ public class GameController {
                 return;
             }
 
-            if (player.hasGambleRevenge() && player.getHealth() <= 20) {
+            if (player.hasGambleRevenge() && player.getHealth() <= GameConfig.HEALTH_CRITICAL) {
                 if (triggerEnding()) continue;
                 return;
             }
@@ -254,7 +254,7 @@ public class GameController {
                 handleMissionVariantEarly(mission.getVariant());
                 earlyVariantShown = true;
             }
-            if (!reputationHelpChecked && player.getReputation() >= 60 && GameConfig.RANDOM.nextDouble() < 0.05) {
+            if (!reputationHelpChecked && player.getReputation() >= GameConfig.REPUTATION_VETERAN && GameConfig.RANDOM.nextDouble() < 0.05) {
                 System.out.println("一个路人认出了你：\"我听说过你做的事。拿着，夜之城需要更多你这样的人。\"");
                 player.restoreHealth(10);
                 System.out.println("恢复 10 点血量。");
@@ -789,7 +789,7 @@ public class GameController {
     private void showTarget() {
         System.out.println("\n\n\n");
         System.out.println("========================================");
-        System.out.println("  目标：攒够 8000€ 逃离夜之城");
+        System.out.println("  目标：攒够 " + GameConfig.WIN_TARGET + "€ 逃离夜之城");
         System.out.println("  当前进度：" + player.getMoney() + "€");
         int remaining = player.getTargetMoney() - player.getMoney();
         if (remaining > 0) {
