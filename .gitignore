@@ -1,5 +1,6 @@
 # Java 编译产物
 out/
+test-out/
 *.class
 *.jar
 *.war

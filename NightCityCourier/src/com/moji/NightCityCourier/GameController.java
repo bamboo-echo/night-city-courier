@@ -303,11 +303,10 @@ public class GameController {
                 int eventType = weightedEventType();
                 String[] eventKeys = {"POLICE", "GANG", "BREAKDOWN", "RIVAL", "RESCUE", "GHOST", "GAMBLE", "SCAN", "SCAVENGER"};
                 String actualKey = eventKeys[eventType];
-                if (echoPool.shouldTriggerEcho("", 0.08)) {
-                    int count = echoPool.getEncounterCount(actualKey);
-                    if (count > 0) {
-                        System.out.println(echoPool.getEchoText(actualKey, count));
-                    }
+                echoPool.recordEncounter(actualKey);
+                // 回响：同一类事件第二次以上遭遇时，按当前遭遇次数取回响文案
+                if (echoPool.shouldTriggerEcho(actualKey, 0.08) && echoPool.getEncounterCount(actualKey) > 1) {
+                    System.out.println(echoPool.getEchoText(actualKey, echoPool.getEncounterCount(actualKey)));
                 }
                 int stepDelta = processEncounter(mission, step, eventType);
                 if (stepDelta == -999) return false;
@@ -339,7 +338,6 @@ public class GameController {
                     System.out.println("🛡️ 反追踪装置提前探测到警方扫描，你绕道避开了。");
                     return 1;
                 }
-                echoPool.recordEncounter("POLICE");
                 boolean eventSuccess = eventSystem.threatEvent(player, "POLICE");
                 if (!eventSuccess) return -999;
                 return stepDelta;
@@ -353,13 +351,11 @@ public class GameController {
                     System.out.println("🛡️ 你在帮派出没区域提前察觉埋伏，绕道避开了。");
                     return 1;
                 }
-                echoPool.recordEncounter("GANG");
                 boolean eventSuccess = eventSystem.threatEvent(player, "GANG");
                 if (!eventSuccess) return -999;
                 return stepDelta;
             }
             case 2 -> {
-                echoPool.recordEncounter("BREAKDOWN");
                 boolean rushFix = eventSystem.breakdownEvent(player);
                 if (!rushFix) {
                     System.out.println("原地修复故障，没有前进...");
@@ -368,7 +364,6 @@ public class GameController {
                 return stepDelta;
             }
             case 3 -> {
-                echoPool.recordEncounter("RIVAL");
                 boolean eventSuccess = eventSystem.rivalCourierEvent(player);
                 if (!eventSuccess) {
                     mission.setReward(0);
@@ -381,23 +376,19 @@ public class GameController {
                 return stepDelta;
             }
             case 4 -> {
-                echoPool.recordEncounter("RESCUE");
                 int rescueDelta = eventSystem.rescueEvent(player);
                 stepDelta += rescueDelta;
                 return stepDelta;
             }
             case 5 -> {
-                echoPool.recordEncounter("GHOST");
                 eventSystem.ghostEvent(player);
                 return stepDelta;
             }
             case 6 -> {
-                echoPool.recordEncounter("GAMBLE");
                 eventSystem.gambleEvent(player);
                 return stepDelta;
             }
             case 7 -> {
-                echoPool.recordEncounter("SCAN");
                 if (eventSystem.scanEvent(player)) {
                     int extraSteps = player.getWantedLevel() >= 3 ? 3 : 2;
                     mission.addTimeNeed(extraSteps);
@@ -409,7 +400,6 @@ public class GameController {
                 return stepDelta;
             }
             case 8 -> {
-                echoPool.recordEncounter("SCAVENGER");
                 eventSystem.scavengerEvent(player);
                 return stepDelta;
             }
@@ -524,7 +514,10 @@ public class GameController {
         System.out.println("🚔 ─── 陷阱件 ─── 🚔");
         System.out.println("你刚放下货物，四周突然亮起警灯——收货人是城警卧底！");
         int choice = gameWindow.showChoiceDialog("陷阱件", "选择", new String[]{"交出货物", "逃跑"});
-        if (choice < 0) choice = 1;
+        if (choice < 0) {
+            System.out.println(">> 你犹豫了。货还在原地，警察也还没下决定。这次什么都不算。");
+            return;
+        }
         if (choice == 1) {
             player.addRefuseCount();
             player.addWantedLevel(GameConfig.TRAP_WANTED_INCREASE);
@@ -532,8 +525,9 @@ public class GameController {
         } else {
             player.setTrapSurrendered(true);
             player.addEcho(GameConfig.ECHO_TRAP_SURRENDER);
-            player.costMoney(player.getMoney() / 10);
-            System.out.println("你老实交出货物，被罚了一笔小钱。");
+            int fine = player.getMoney() / 10;
+            player.costMoney(fine);
+            System.out.println("你交出货物和报酬。城警收了货，又罚了你 " + fine + "€ 作为运输违禁品的手续费。");
         }
     }
 
@@ -837,3 +831,4 @@ public class GameController {
         }
     }
 }
+
