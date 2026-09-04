@@ -84,14 +84,14 @@ public class Main {
                 g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 12, 12);
 
                 g2.setColor(new Color(0x00, 0xCC, 0xCC));
-                Font titleFont = new Font("Microsoft YaHei", Font.BOLD, 28);
+                Font titleFont = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 28);
                 g2.setFont(titleFont);
                 FontMetrics fm = g2.getFontMetrics();
                 String title = "夜之城快递员";
                 g2.drawString(title, (getWidth() - fm.stringWidth(title)) / 2, 80);
 
                 g2.setColor(new Color(0xC0, 0xC0, 0xC0));
-                Font subFont = new Font("Microsoft YaHei", Font.PLAIN, 14);
+                Font subFont = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 14);
                 g2.setFont(subFont);
                 FontMetrics sfm = g2.getFontMetrics();
                 g2.drawString("NIGHT CITY COURIER SYSTEM v1.3.7",
@@ -117,7 +117,7 @@ public class Main {
                 g2.drawRoundRect(barX, barY, barW, barH, 6, 6);
 
                 g2.setColor(new Color(0xC0, 0xC0, 0xC0));
-                Font statusFont = new Font("Microsoft YaHei", Font.PLAIN, 13);
+                Font statusFont = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 13);
                 g2.setFont(statusFont);
                 FontMetrics stfm = g2.getFontMetrics();
                 int percent = (int) (progress * 100);
@@ -125,7 +125,7 @@ public class Main {
                 g2.drawString(pctText, (getWidth() - stfm.stringWidth(pctText)) / 2, barY + barH + 30);
 
                 g2.setColor(new Color(0x66, 0x66, 0x88));
-                Font hintFont = new Font("Microsoft YaHei", Font.PLAIN, 11);
+                Font hintFont = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 11);
                 g2.setFont(hintFont);
                 FontMetrics hfm = g2.getFontMetrics();
                 g2.drawString(statusText, (getWidth() - hfm.stringWidth(statusText)) / 2, barY + barH + 55);

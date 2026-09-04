@@ -482,7 +482,7 @@ public class EndingSystem {
      */
     public EndingType determineEnding() {
 
-        if (player.hasGambleRevenge() && player.getHealth() <= 20) {
+        if (player.hasGambleRevenge() && player.getHealth() <= GameConfig.HEALTH_CRITICAL) {
             return EndingType.GAMBLE_REVENGE;
         }
 
@@ -497,7 +497,7 @@ public class EndingSystem {
         if (player.isWin()) {
 
             if (player.getHelpCount() >= 3
-                    && player.getReputation() >= 60
+                    && player.getReputation() >= GameConfig.REPUTATION_VETERAN
                     && player.hasRivalFriend()
                     && player.hasSparedLife()
                     && !player.hasJoinedGang()
@@ -507,7 +507,7 @@ public class EndingSystem {
             }
 
             if (player.hasJoinedGang() && player.hasStoleFromDead() && player.hasLooted()
-                    && player.getReputation() <= 20) {
+                    && player.getReputation() <= GameConfig.REPUTATION_BOTTOM) {
                 return EndingType.FALLEN_KINGPIN;
             }
 
@@ -651,7 +651,7 @@ public class EndingSystem {
             sb.append("同行之门里，那个曾经和你抢单的快递员走了出来。他把头盔递给你。\n");
             sb.append("\"下一单，我跟你一起去。\"\n\n");
         }
-        sb.append("你选择了走出去。8000€交到边境守卫手中。\n");
+        sb.append("你选择了走出去。").append(GameConfig.WIN_TARGET).append("€交到边境守卫手中。\n");
         sb.append("守卫看了看你的档案：救人").append(player.getHelpCount()).append("次，声望").append(player.getReputation()).append("。\n");
         sb.append("\"走吧。\"他说。\n\n");
         sb.append("你走出城门。身后，整条街的快递员同时鸣笛。\n");
@@ -676,7 +676,7 @@ public class EndingSystem {
         if (player.hasLooted()) {
             sb.append("你还记得那个求救者吗？不记得了。他的钱在你口袋里。\n\n");
         }
-        sb.append("你选择了烧掉它。8000€在火光中化为灰烬。\n");
+        sb.append("你选择了烧掉它。").append(GameConfig.WIN_TARGET).append("€在火光中化为灰烬。\n");
         sb.append("守卫看着你，没有阻止。\"夜之城见过比你更疯的。\"\n\n");
         sb.append("你转身回城。口袋里空空，名声狼藉。\n");
         sb.append("但你还活着。在夜之城，这就算赢。\n\n");
@@ -690,7 +690,7 @@ public class EndingSystem {
 
     private String generateBrotherhood() {
         StringBuilder sb = new StringBuilder();
-        sb.append("城门在身后关上。你站在边境，手中攥着8000€。\n\n");
+        sb.append("城门在身后关上。你站在边境，手中攥着").append(GameConfig.WIN_TARGET).append("€。\n\n");
         sb.append(getMemoryAttitude()).append("\n\n");
         sb.append("同行站在你旁边，手里还拿着那个头盔。\n");
         sb.append("\"下一单，我跟你一起去。\"他说。\n\n");
@@ -726,7 +726,7 @@ public class EndingSystem {
 
     private String generateQuietEscape() {
         StringBuilder sb = new StringBuilder();
-        sb.append("城门在身后关上。你数了数口袋里的钱：8000€整。\n\n");
+        sb.append("城门在身后关上。你数了数口袋里的钱：").append(GameConfig.WIN_TARGET).append("€整。\n\n");
         sb.append(getMemoryAttitude()).append("\n\n");
         sb.append("守卫挥了挥手，你走了出去。\n");
         sb.append("身后，夜之城的霓虹在闪烁，与你无关。\n\n");

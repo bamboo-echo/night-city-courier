@@ -62,6 +62,8 @@ public class CoreSystemsTest {
         saveLoadRoundtrip();
         saveLoadRoundtripSpecialChars();
         saveLoadFileRoundtrip();
+        fontResolutionCrossPlatform();
+        endingTextUsesWinTarget();
     }
 
     private void endingPriority() {
@@ -400,6 +402,90 @@ public class CoreSystemsTest {
             new java.io.File(savePath).delete();
             new java.io.File(savePath + ".bak").delete();
         }
+    }
+
+    /**
+     * 字体族解析不应只是「非空」，而应真实可用。
+     * 回归背景：原实现硬编码 "Microsoft YaHei"，该字体仅 Windows 有；
+     * 在 macOS / Linux 上会 fallback 到逻辑字体，中文字形缺失渲染成豆腐块（□）。
+     * 修复后按平台优先顺序探测已安装 CJK 字体，未命中时退回逻辑字体。
+     */
+    private void fontResolutionCrossPlatform() {
+        String fam = GameConfig.resolveFontFamily();
+        String emoji = GameConfig.resolveEmojiFontFamily();
+        assertTrue(fam != null && !fam.isEmpty(), "中文字体族解析不应为空");
+        assertTrue(emoji != null && !emoji.isEmpty(), "emoji 字体族解析不应为空");
+
+        // 解析结果必须是已安装字体族，或 Swing 内置逻辑字体兜底
+        String[] available = java.awt.GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        for (String want : new String[]{fam, emoji}) {
+            boolean found = "SansSerif".equals(want) || "Serif".equals(want)
+                    || "Monospaced".equals(want);
+            if (!found) {
+                for (String have : available) {
+                    if (have.equals(want)) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            assertTrue(found, "解析出的字体族应真实可用: " + want);
+        }
+
+        // 用解析结果构造 Font 不应抛异常（覆盖 headless / 字体环境异常路径）
+        java.awt.Font f = new java.awt.Font(GameConfig.FONT_FAMILY, java.awt.Font.PLAIN, 16);
+        assertTrue(f != null, "按解析字体族构造 Font 应成功");
+    }
+
+    /**
+     * 回归测试：结局文案里的金额必须跟随 WIN_TARGET，不得写死。
+     * 原实现在 GameController / EndingSystem / GameWindow 中把「8000€」硬编码
+     * 进叙事文案，而 README 又声明 WIN_TARGET 是可调的演示参数。一旦把它调小
+     * 以压缩流程，玩家看到的却是「8000€交到边境守卫手中」，数字与判定脱钩。
+     * <p>这里不断言「文案含 8000」，而是抽出文案中所有「数字+€」，
+     * 断言它们都等于玩家实际目标金额——这样有人改 WIN_TARGET 却漏改文案时测试才会报错。
+     */
+    private void endingTextUsesWinTarget() {
+        // ── QUIET_ESCAPE：达标、无任何标志位 ──
+        Player p = new Player("文案测试");
+        p.addMoney(GameConfig.WIN_TARGET);
+        int target = p.getTargetMoney();
+        assertTrue(p.isWin(), "前置条件：应已达标");
+        assertTrue(target > 0, "前置条件：目标金额应为正数");
+
+        EndingSystem quiet = new EndingProbe(p);
+        assertEq(quiet.determineEnding(), EndingSystem.EndingType.QUIET_ESCAPE,
+                "仅达标应判定为平凡逃离");
+        assertEndingAmount(quiet.generate(), target, "QUIET_ESCAPE");
+
+        // ── BROTHERHOOD：达标 + 有挚友，排除入帮/偷窃 ──
+        Player q = new Player("文案测试2");
+        q.addMoney(GameConfig.WIN_TARGET);
+        q.setRivalFriend(true);
+        EndingSystem bro = new EndingProbe(q);
+        assertEq(bro.determineEnding(), EndingSystem.EndingType.BROTHERHOOD,
+                "达标且有挚友应判定为同行结局");
+        assertEndingAmount(bro.generate(), target, "BROTHERHOOD");
+    }
+
+    /**
+     * 抽出文案中所有「数字+€」片段，逐一断言等于目标金额。
+     * 非金额的计数（如「救人3次」）不跟 € 相连，不会被误伤。
+     */
+    private void assertEndingAmount(String text, int expectedTarget, String label) {
+        assertTrue(text != null && !text.isEmpty(), label + " 文案不应为空");
+        assertTrue(text.contains(expectedTarget + "€"),
+                label + " 文案应包含目标金额 " + expectedTarget);
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d+)€").matcher(text);
+        int count = 0;
+        while (m.find()) {
+            count++;
+            int n = Integer.parseInt(m.group(1));
+            assertEq(n, expectedTarget,
+                    label + " 文案金额 " + n + "€ 应等于目标 " + expectedTarget + "€");
+        }
+        assertTrue(count > 0, label + " 文案应至少出现一次金额");
     }
 
     private boolean allFlagsMatch(Player a, Player b) {

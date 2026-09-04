@@ -1,4 +1,5 @@
 package com.moji.NightCityCourier;
+import java.awt.GraphicsEnvironment;
 import java.util.*;
 
 /**
@@ -120,6 +121,89 @@ public final class GameConfig {
 
     /** 逃离夜之城所需的目标金额 */
     public static final int WIN_TARGET = 8000;
+
+    // ────────── 判定阈值（结局与运行时事件共用，避免跨类漂移） ──────────
+
+    /** 生命值降到该值视为「致命伤」，影响赌局复仇与结局判定 */
+    public static final int HEALTH_CRITICAL = 20;
+    /** 声望达到该值视为「老手」，触发老手援手与结局判定 */
+    public static final int REPUTATION_VETERAN = 60;
+    /** 声望低于该值视为「底层」，影响结局判定 */
+    public static final int REPUTATION_BOTTOM = 20;
+
+    // ────────── 字体（跨平台） ──────────
+
+    /**
+     * 跨平台中文字体族名。
+     * <p>原实现硬编码 "Microsoft YaHei"，该字体仅存在于 Windows。
+     * 在 macOS / Linux 上会静默 fallback 到逻辑字体，中文字形可能缺失渲染成豆腐块（□）。
+     * 现按平台优先顺序探测已安装的 CJK 字体族，取第一个命中的。
+     * <p>解析失败或 headless 环境（无显示设备）时退回 Swing 逻辑字体 "SansSerif"，
+     * 保证任何平台都能启动，不抛异常。
+     */
+    public static final String FONT_FAMILY = resolveFontFamily();
+
+    static String resolveFontFamily() {
+        // 按平台常见度 + 中文字形完整度排序
+        String[] preferred = {
+                "Microsoft YaHei UI",   // Windows 10/11 首选
+                "Microsoft YaHei",      // Windows 通用
+                "PingFang SC",          // macOS 首选
+                "Hiragino Sans GB",     // macOS 备选
+                "Noto Sans CJK SC",     // Linux（Google 思源）
+                "Source Han Sans SC",   // Linux（思源）
+                "WenQuanYi Micro Hei",  // 文泉驿微米黑
+                "WenQuanYi Zen Hei",    // 文泉驿正黑
+                "Droid Sans Fallback",  // Android / 部分 Linux
+                "SimHei",               // Windows 老版本简体黑体
+                "SimSun"                // Windows 老版本宋体
+        };
+        try {
+            String[] available = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+            for (String want : preferred) {
+                for (String have : available) {
+                    if (have.equals(want)) {
+                        return want;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // headless 或字体环境异常，走逻辑字体兜底
+        }
+        return "SansSerif";
+    }
+
+    /**
+     * 跨平台 emoji 字体族名。
+     * <p>"Segoe UI Emoji" 仅 Windows 有。macOS 用 "Apple Color Emoji"，
+     * Linux 常见 "Noto Color Emoji"。缺失时退回逻辑字体，emoji 可能显示为方框，
+     * 但不会抛异常或阻塞渲染。
+     */
+    public static final String EMOJI_FONT_FAMILY = resolveEmojiFontFamily();
+
+    static String resolveEmojiFontFamily() {
+        String[] preferred = {
+                "Segoe UI Emoji",       // Windows
+                "Apple Color Emoji",    // macOS
+                "Noto Color Emoji",     // Linux
+                "Noto Emoji"            // 部分 Linux 发行版
+        };
+        try {
+            String[] available = GraphicsEnvironment
+                    .getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+            for (String want : preferred) {
+                for (String have : available) {
+                    if (have.equals(want)) {
+                        return want;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // headless 或字体环境异常
+        }
+        return "SansSerif";
+    }
 
     private GameConfig() {}
 }
