@@ -403,11 +403,11 @@ public class EventSystem {
                 "赶他滚蛋。"
         );
         if (choice == 1) {
-            System.out.println(">> 你掏出 " + 50 + "€，递了过去。");
             if (player.getMoney() < 50) {
                 System.out.println("钱不够。拾荒者失望地缩回了工厂。");
                 return;
             }
+            System.out.println(">> 你掏出 " + 50 + "€，递了过去。");
             player.costMoney(50);
             player.addScavengerIntel();
             player.addEcho(GameConfig.ECHO_SCAVENGER_INTEL);

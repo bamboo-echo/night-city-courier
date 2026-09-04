@@ -95,7 +95,6 @@ public class EndingSystem {
 
     private final Player player;
     private final List<Gate> gates;
-    private int facedCount = 0;
     private String mirrorState = "完整";
 
     public EndingSystem(Player player) {
@@ -369,7 +368,6 @@ public class EndingSystem {
             Gate g = gates.get(index);
             if (!g.isEmpty) {
                 setEchoStatus(g.echoSource, Player.EchoStone.EchoStatus.FACED);
-                facedCount++;
             }
         }
     }
@@ -464,72 +462,16 @@ public class EndingSystem {
     public int getGateCount() {
         return gates.size();
     }
-    public int getFacedCount() {
-        return facedCount;
-    }
-    public void resetFacedCount() {
-        facedCount = 0;
-    }
-    public String getMirrorState() {
-        return mirrorState;
-    }
 
     /**
-     * @deprecated 此方法已不再使用，结局流程由 GameController 中的 handleLastDelivery() 和 triggerEnding() 取代。
+     * 正面面对的门数。直接从回响石状态统计，避免维护第二份账。
      */
-    @Deprecated
-    public boolean triggerEnding(Player player, GameWindow gameWindow, GameController controller) {
-        System.out.println("\n\n\n");
-        System.out.println("══════════════════════════════════");
-        System.out.println("  九道门 —— 回响审判");
-        System.out.println("══════════════════════════════════");
-        System.out.println("你站在一条无尽的走廊里。前方是九扇门。");
-        System.out.println("每一扇门后，都是你的一段记忆。");
-        System.out.println("你可以面对它、绕过它、或者把它砸碎。");
-        System.out.println("你的选择将决定你是谁。\n");
+    public int getFacedCount() {
+        return player.countEchoByStatus(Player.EchoStone.EchoStatus.FACED);
+    }
 
-        List<String> gateNames = getGateNames();
-        for (int i = 0; i < gateNames.size(); i++) {
-            System.out.println("\n\n\n");
-            System.out.println("🚪 ─── 第 " + (i + 1) + " 道门：" + gateNames.get(i) + " ─── 🚪");
-
-            String scene = enterGateSafe(i);
-            System.out.println(scene);
-
-            int choice = gameWindow.showChoiceDialog(
-                    gateNames.get(i),
-                    "面对、绕过，还是击碎？",
-                    new String[]{"面对", "绕过", "击碎"}
-            );
-            if (choice < 0) choice = 0;
-            switch (choice) {
-                case 0 -> {
-                    if (i < getGateCount()) {
-                        faceGate(i);
-                    }
-                    System.out.println(getFaceMessage(i));
-                }
-                case 1 -> {
-                    if (i < getGateCount()) {
-                        bypassGate(i);
-                    }
-                    System.out.println(getBypassMessage(i));
-                }
-                case 2 -> {
-                    if (i < getGateCount()) {
-                        shatterGate(i);
-                    }
-                    System.out.println(getShatterMessage(i));
-                }
-            }
-        }
-
-        System.out.println("\n\n\n");
-        System.out.println(buildEchoSummary());
-        System.out.println(generate());
-        System.out.println(getTerminalAttitude());
-
-        return true;
+    public String getMirrorState() {
+        return mirrorState;
     }
 
     /**
