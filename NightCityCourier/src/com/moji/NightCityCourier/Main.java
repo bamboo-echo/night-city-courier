@@ -1,4 +1,6 @@
 package com.moji.NightCityCourier;
+import com.moji.NightCityCourier.core.DailyChallenge;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -30,6 +32,18 @@ public class Main {
             } else {
                 name = name.trim();
             }
+            // 模式选择：普通局用随机种子，每日挑战用日期派生种子（同日全城一致）
+            DailyChallenge.Spec daily = DailyChallenge.today();
+            long seed = System.nanoTime();
+            int mode = gw.showChoiceDialog("模式",
+                    "选择今晚的活法\n\n" + daily.headline(),
+                    new String[]{"普通局", "每日挑战"});
+            if (mode == 1) {
+                seed = daily.seed();
+                System.out.println("\n【每日挑战】" + daily.ruleName() + " —— " + daily.ruleDesc());
+                System.out.println("【种子】" + daily.seed() + "（今天的城对所有人一样）\n");
+            }
+
             Player player = new Player(name);
             if (Player.hasSave()) {
                 int loadChoice = gw.showChoiceDialog("存档", "检测到存档，是否加载？", new String[]{"加载", "新游戏"});
@@ -48,7 +62,7 @@ public class Main {
             MissionManager mm = new MissionManager();
             UpgradeSystem us = new UpgradeSystem();
             EventSystem es = new EventSystem(gw);
-            GameController controller = new GameController(player, mm, us, es, gw);
+            GameController controller = new GameController(player, mm, us, es, gw, seed);
             controller.run();
         }).start();
     }
