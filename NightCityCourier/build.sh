@@ -36,15 +36,16 @@ rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR"
 
 echo "[编译] 主程序..."
-javac -encoding UTF-8 -d "$OUT_DIR" "$SRC_DIR"/*.java
+javac -encoding UTF-8 -d "$OUT_DIR" "$SRC_DIR"/*.java "$SRC_DIR"/core/*.java "$SRC_DIR"/ui/*.java
 
 if [ "$TEST" = true ]; then
   rm -rf "$TEST_OUT_DIR"
   mkdir -p "$TEST_OUT_DIR"
   echo "[编译] 单元测试..."
-  javac -encoding UTF-8 -d "$TEST_OUT_DIR" "$SRC_DIR"/*.java "$TEST_SRC_DIR"/*.java
+  javac -encoding UTF-8 -d "$TEST_OUT_DIR" "$SRC_DIR"/*.java "$SRC_DIR"/core/*.java "$SRC_DIR"/ui/*.java "$TEST_SRC_DIR"/*.java
   echo "[运行] 单元测试..."
-  java -cp "$TEST_OUT_DIR" com.moji.NightCityCourier.CoreSystemsTest
+  java -Djava.awt.headless=true -cp "$TEST_OUT_DIR" com.moji.NightCityCourier.CoreSystemsTest
+  java -Djava.awt.headless=true -cp "$TEST_OUT_DIR" com.moji.NightCityCourier.V2SystemsTest
   echo "[完成] 单元测试全部通过 ✅"
 fi
 

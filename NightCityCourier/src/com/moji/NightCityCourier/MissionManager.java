@@ -40,7 +40,12 @@ public class MissionManager {
         LIFESAVER("救命件"),
         REROUTE("错送件"),
         CONFESSION("告白件"),
-        EVIDENCE("证据件");
+        EVIDENCE("证据件"),
+        ORGAN("器官件"),
+        DATA("数据件"),
+        PET("活体宠物件"),
+        WEDDING("婚礼件"),
+        BOMB("定时件");
 
         public final String displayName;
 
@@ -130,6 +135,22 @@ public class MissionManager {
         /** 降低任务风险值，最低降至0.1 */
         public void reduceRisk(double amount) {
             this.risk = Math.max(0.1, this.risk - amount);
+        }
+
+        /**
+         * 增减风险值，收敛到 [0.1, 5.0]。
+         * 与 {@link #reduceRisk(double)} 的区别：本方法接受负值，用于路线修正。
+         */
+        public void adjustRisk(double delta) {
+            this.risk = Math.max(0.1, Math.min(5.0, this.risk + delta));
+        }
+
+        /**
+         * 增减赶路步数，下限 2 步——再快的路线也得穿城。
+         * 路线加成与义体节流都走这里，避免出现 0 步直达。
+         */
+        public void adjustTimeNeed(int delta) {
+            this.timeNeed = Math.max(2, this.timeNeed + delta);
         }
 
         /** 免除失败罚金（幽灵帮助效果） */

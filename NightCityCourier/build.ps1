@@ -30,7 +30,7 @@ if (Test-Path $OutDir) { Remove-Item -Recurse -Force $OutDir }
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 
 Write-Host "[编译] 主程序..." -ForegroundColor Cyan
-javac -encoding UTF-8 -d $OutDir (Join-Path $SrcDir "*.java")
+javac -encoding UTF-8 -d $OutDir (Join-Path $SrcDir "*.java") (Join-Path $SrcDir "core\*.java") (Join-Path $SrcDir "ui\*.java")
 if ($LASTEXITCODE -ne 0) { Write-Host "[错误] 编译失败" -ForegroundColor Red; exit 1 }
 
 # ── 测试 ──
@@ -38,11 +38,13 @@ if ($Test) {
     if (Test-Path $TestOutDir) { Remove-Item -Recurse -Force $TestOutDir }
     New-Item -ItemType Directory -Force -Path $TestOutDir | Out-Null
     Write-Host "[编译] 单元测试..." -ForegroundColor Cyan
-    javac -encoding UTF-8 -d $TestOutDir (Join-Path $SrcDir "*.java") (Join-Path $TestSrcDir "*.java")
+    javac -encoding UTF-8 -d $TestOutDir (Join-Path $SrcDir "*.java") (Join-Path $SrcDir "core\*.java") (Join-Path $SrcDir "ui\*.java") (Join-Path $TestSrcDir "*.java")
     if ($LASTEXITCODE -ne 0) { Write-Host "[错误] 测试编译失败" -ForegroundColor Red; exit 1 }
 
     Write-Host "[运行] 单元测试..." -ForegroundColor Cyan
-    java -cp $TestOutDir com.moji.NightCityCourier.CoreSystemsTest
+    java -Djava.awt.headless=true -cp $TestOutDir com.moji.NightCityCourier.CoreSystemsTest
+    if ($LASTEXITCODE -ne 0) { Write-Host "[失败] 核心单元测试未通过" -ForegroundColor Red; exit 1 }
+    java -Djava.awt.headless=true -cp $TestOutDir com.moji.NightCityCourier.V2SystemsTest
     if ($LASTEXITCODE -ne 0) { Write-Host "[失败] 单元测试未全部通过" -ForegroundColor Red; exit 1 }
     Write-Host "[完成] 单元测试全部通过" -ForegroundColor Green
 }

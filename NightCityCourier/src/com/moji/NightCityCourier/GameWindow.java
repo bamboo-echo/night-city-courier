@@ -1,4 +1,8 @@
 package com.moji.NightCityCourier;
+import com.moji.NightCityCourier.ui.Screens;
+import com.moji.NightCityCourier.ui.Theme;
+import com.moji.NightCityCourier.ui.UiKit;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -25,28 +29,29 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class GameWindow extends JFrame {
 
-    private static final Color BG_DARK = new Color(0x0A, 0x0A, 0x14);
-    private static final Color BG_TEXT_AREA = new Color(0x0F, 0x0F, 0x1A);
-    private static final Color FG_MAIN = new Color(0xC0, 0xC0, 0xC0);
-    private static final Color FG_PURPLE = new Color(0xB3, 0x66, 0xFF);
-    private static final Color FG_CYAN = new Color(0x00, 0xCC, 0xCC);
-    private static final Color FG_DANGER = new Color(0xFF, 0x6B, 0x6B);
-    private static final Color FG_SUCCESS = new Color(0x00, 0xCC, 0x66);
-    private static final Color FG_WARNING = new Color(0xFF, 0xB3, 0x00);
-    private static final Color FG_MAGENTA = new Color(0xFF, 0x00, 0x7F);
-    private static final Color FG_WHITE_BOLD = new Color(0xFF, 0xFF, 0xFF);
-    private static final Color BORDER_COLOR = new Color(0x1A, 0x3A, 0x3A);
-    private static final Color BUTTON_BG = new Color(0x0A, 0x0A, 0x14);
-    private static final Color BUTTON_FG = FG_CYAN;
-    private static final Color BUTTON_BORDER = new Color(0x00, 0xCC, 0xCC);
-    private static final Color BUTTON_HOVER_BG = new Color(0x00, 0xCC, 0xCC, 0x1A);
-    private static final Color BUTTON_HOVER_BORDER = new Color(0x00, 0xFF, 0xFF);
-    private static final Color BUTTON_HOVER_GLOW = new Color(0x00, 0xFF, 0xFF, 0x40);
-    private static final Color DIMMED_TEXT = new Color(0x55, 0x55, 0x66);
+    // 色板统一指向 ui.Theme：冷灰工业 HUD，单一琥珀强调色，去掉霓虹紫青与发光。
+    private static final Color BG_DARK = Theme.BG;
+    private static final Color BG_TEXT_AREA = Theme.INSET;
+    private static final Color FG_MAIN = Theme.TEXT;
+    private static final Color FG_PURPLE = Theme.ACCENT;
+    private static final Color FG_CYAN = Theme.ACCENT;
+    private static final Color FG_DANGER = Theme.DANGER;
+    private static final Color FG_SUCCESS = Theme.OK;
+    private static final Color FG_WARNING = Theme.ACCENT;
+    private static final Color FG_MAGENTA = Theme.DANGER;
+    private static final Color FG_WHITE_BOLD = Theme.TEXT;
+    private static final Color BORDER_COLOR = Theme.LINE;
+    private static final Color BUTTON_BG = Theme.PANEL;
+    private static final Color BUTTON_FG = Theme.TEXT_DIM;
+    private static final Color BUTTON_BORDER = Theme.LINE_STRONG;
+    private static final Color BUTTON_HOVER_BG = Theme.RAISED;
+    private static final Color BUTTON_HOVER_BORDER = Theme.ACCENT;
+    private static final Color BUTTON_HOVER_GLOW = Theme.RAISED;
+    private static final Color DIMMED_TEXT = Theme.TEXT_FAINT;
 
-    private static final Font TERMINAL_FONT = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 16);
-    private static final Font BUTTON_FONT = new Font(GameConfig.FONT_FAMILY, Font.BOLD, 15);
-    private static final Font TITLE_FONT = new Font(GameConfig.FONT_FAMILY, Font.PLAIN, 11);
+    private static final Font TERMINAL_FONT = Theme.sans(15);
+    private static final Font BUTTON_FONT = Theme.sansBold(13);
+    private static final Font TITLE_FONT = Theme.mono(11);
 
     private JTextPane outputPane;
     private StyledDocument doc;
@@ -256,19 +261,10 @@ public class GameWindow extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if (getModel().isRollover()) {
-                    g2.setColor(BUTTON_HOVER_BG);
-                    g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
-                    g2.setColor(BUTTON_HOVER_GLOW);
-                    g2.setStroke(new BasicStroke(2));
-                    g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
-                }
-                g2.setColor(BUTTON_BORDER);
-                g2.setStroke(new BasicStroke(1));
-                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                UiKit.prepare(g2);
+                UiKit.button(g2, text, 0, 0, getWidth(), getHeight(),
+                        getModel().isRollover(), false);
                 g2.dispose();
-                super.paintComponent(g);
             }
         };
         btn.setFont(BUTTON_FONT);
@@ -330,11 +326,16 @@ public class GameWindow extends JFrame {
     }
 
     private void startGlitchEffect() {
-        if (glitchTimer != null) glitchTimer.stop();
-        scheduleNextGlitch();
+        // v2.0：窗口抖动属于廉价故障感，已移除。保留空实现以兼容既有调用点。
+        if (glitchTimer != null) {
+            glitchTimer.stop();
+        }
     }
 
     private void scheduleNextGlitch() {
+        if (true) {
+            return;
+        }
         int delay = baseGlitchInterval + (int) (Math.random() * 30000);
         if (hudPanel != null) {
             int wl = hudPanel.getWantedLevel();
@@ -918,6 +919,22 @@ public class GameWindow extends JFrame {
 
         @Override
         protected void paintComponent(Graphics g) {
+            if (true) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                Player p = this.player;
+                Screens.hudStrip(g2, getWidth(), getHeight(),
+                        p == null ? "V" : p.getName(),
+                        p == null ? 100 : p.getHealth(),
+                        p == null ? 100 : p.getMaxHealth(),
+                        p == null ? 0 : p.getMoney(),
+                        p == null ? GameConfig.WIN_TARGET : p.getTargetMoney(),
+                        p == null ? 0 : p.getWantedLevel(),
+                        GameConfig.WANTED_MAX,
+                        p == null ? 0 : p.getReputation(),
+                        p == null ? 1 : p.getLevel());
+                g2.dispose();
+                return;
+            }
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);

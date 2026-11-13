@@ -61,6 +61,14 @@ public final class GameConfig {
     public static final int GAMBLE_WEIGHT = 5;
     public static final int SCAN_WEIGHT = 6;
     public static final int SCAVENGER_WEIGHT = 6;
+    /** v2.0 新增事件权重 */
+    public static final int DRONE_WEIGHT = 7;
+    public static final int RIPPERDOC_WEIGHT = 6;
+    public static final int RADIO_WEIGHT = 6;
+    public static final int PERFORMER_WEIGHT = 5;
+    public static final int PICKPOCKET_WEIGHT = 6;
+    public static final int EXLOVER_WEIGHT = 4;
+    public static final int CORPO_WEIGHT = 5;
 
     /** 通缉等级上限 */
     public static final int WANTED_MAX = 5;
